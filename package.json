@@ -1,0 +1,52 @@
+{
+  "scripts": {
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "web": "expo start --web",
+    "eject": "expo eject"
+  },
+  "dependencies": {
+    "@react-native-community/datetimepicker": "3.5.2",
+    "@react-native-community/masked-view": "0.1.10",
+    "@react-navigation/drawer": "^5.12.5",
+    "@react-navigation/native": "^5.8.10",
+    "@react-navigation/stack": "^5.12.8",
+    "base-64": "^1.0.0",
+    "exp": "^57.2.1",
+    "expo": "^42.0.0",
+    "expo-linear-gradient": "~9.2.0",
+    "expo-notifications": "~0.12.3",
+    "expo-print": "~10.2.1",
+    "expo-sharing": "~9.2.1",
+    "expo-splash-screen": "~0.11.2",
+    "expo-status-bar": "~1.0.4",
+    "expo-updates": "~0.8.2",
+    "firebase": "8.2.3",
+    "firesql": "^2.0.2",
+    "install": "^0.13.0",
+    "moment": "^2.29.1",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-native": "0.63.4",
+    "react-native-gesture-handler": "~1.10.2",
+    "react-native-maps": "0.28.0",
+    "react-native-reanimated": "~2.2.0",
+    "react-native-responsive-screen": "^1.4.2",
+    "react-native-safe-area-context": "3.2.0",
+    "react-native-screens": "~3.4.0",
+    "react-native-unimodules": "~0.14.5",
+    "react-native-web": "~0.13.12",
+    "rxfire": "^4.0.0",
+    "rxjs": "^6.6.3"
+  },
+  "devDependencies": {
+    "@babel/core": "~7.9.0",
+    "babel-jest": "~25.2.6",
+    "jest": "~25.2.6",
+    "react-test-renderer": "~16.13.1"
+  },
+  "private": true,
+  "name": "prestamos",
+  "version": "1.0.0"
+}
