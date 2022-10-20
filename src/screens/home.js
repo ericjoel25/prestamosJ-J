@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import 'react-native-gesture-handler';
 import { View, StyleSheet, SafeAreaView, Text, StatusBar, TouchableOpacity, Image, ScrollView } from "react-native";
-import firebase from '../component/firebase/firebase';
 import { LinearGradient } from 'expo-linear-gradient';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
@@ -78,11 +77,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // backgroundColor:"#0B5A8A",
-    width: wp('100%'),
-    height: wp('100%'),
+  //  width: wp('100%'),
+   // height: wp('100%'),
     alignItems: 'center',
     // marginTop:hp('20%'),
-    paddingTop: wp('40%'),
+    paddingTop: wp('50%'),
 
 
   },
@@ -92,11 +91,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    //  backgroundColor:'red',
+  //  backgroundColor:'red',
     maxWidth: wp('90%'),
-    maxHeight: wp('40%'),
+    maxHeight: wp('50%'),
     marginBottom: wp('5%'),
-    marginTop:wp('5%'),
+   // marginTop:wp('5%'),
     paddingBottom:wp('5%')
     //elevation:hp('1.5%')
 
@@ -136,7 +135,7 @@ const styles = StyleSheet.create({
     height: wp('15%'),
     width: wp('100%'),
     alignItems: 'center',
-    paddingTop: hp('1%')
+    paddingTop: hp('1%') 
 
   },
 

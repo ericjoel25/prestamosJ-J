@@ -1,262 +1,358 @@
 import React, { useEffect, useState } from "react";
 import 'react-native-gesture-handler';
-import {SafeAreaView, Text, TouchableOpacity, FlatList, View, StyleSheet, ScrollView, Alert, Image, ActivityIndicator, StatusBar } from "react-native";
+import { SafeAreaView, Text, TouchableOpacity, FlatList, View, StyleSheet, ScrollView, Alert, Image, ActivityIndicator, StatusBar } from "react-native";
 import firebase from '../../component/firebase/firebase';
 import 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import{MaterialIcons, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { MaterialIcons, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Instant } from "../../component/globalStyle/Instant";
 
 
-
-
-firebase.firestore().settings({ experimentalForceLongPolling: true });
 const db = firebase.firestore(firebase);
 
-export default function TodosLosPagos(props){
+export default function TodosLosPagos(props) {
 
-    const{navigation}=props;
+  const { navigation } = props;
 
-    const [formData, setFormData]= useState({});
-    const [totalFormData, setTotalFormData]= useState(0);
-    const [startFormData, setStartFormData]=useState(null);
-    const [isLoading, setIsLoading]= useState(false);
+  const [formData, setFormData] = useState({});
+  const [totalFormData, setTotalFormData] = useState(0);
+  const [startFormData, setStartFormData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-    const limitData=6;
-  
-  
-    useEffect(()=>{
-   
-     //Obtener el tamaño de todo los dactos
-     db.collection('RegistroDePagos').get().then((snap)=>{
+  const limitData = 6;
+
+
+  useEffect(() => {
+
+    //Obtener el tamaño de todo los dactos
+    db.collection('RegistroDePagos').get().then((snap) => {
       setTotalFormData(snap.size);
-   
+
     });
-   
+
     //obtener la information de cada arreglo
     const listData = [];
-    db.collection('RegistroDePagos').orderBy('startAt', 'desc').limit(limitData).get().then((response)=>{
-      
+    db.collection('RegistroDePagos').orderBy('startAt', 'desc').limit(limitData).get().then((response) => {
+
       setStartFormData(response.docs[response.docs.length - 1]);
-   
-       response.forEach((doc)=>{
+
+      response.forEach((doc) => {
         const formDataInformation = doc.data();
         formDataInformation.id = doc.id;
-      
-      //  console.log(formDataInformation);
-       
-      listData.push(formDataInformation);
-   
+
+        //  console.log(formDataInformation);
+
+        listData.push(formDataInformation);
+
       });
-   
-      setFormData(listData); 
-   
+
+      setFormData(listData);
+
+      if(listData.length > 0){
+        setIsLoading(false)
+      }
+
     });
-   
-}, []);
+
+  }, []);
 
 
+  useEffect(()=>{
+    if(formData.length > 0){
+      setIsLoading(false);
+    }else if(formData.length === 0){
+      setTimeout(()=>{
+          setIsLoading(false)
+        
+        },1500)
+    }
+  },[formData])
 
 
-   
-    return(
-        <SafeAreaView>
-            <StatusBar barStyle='light-content' hidden={false} backgroundColor='#A26008' />
-           
-        {
-          formData.length > 0 ? (
-            <FlatList 
-            
+  return (
+    <LinearGradient colors={['#d6ae7b', '#d6ae7b']}  style={styles.body}>
+      <StatusBar barStyle='light-content' hidden={false} backgroundColor='#A26008' />
+
+
+      {isLoading === true ? (
+
+        <LinearGradient colors={['#d6ae7b', '#d6ae7b']} style={styles.loadingContainer}>
+          <LinearGradient colors={['#c31432', '#240b36']} style={styles.loadingBody}>
+            <ActivityIndicator color='#fff' size={wp('15%')} />
+            <Text style={styles.loadingBodyText}>Cargando...</Text>
+          </LinearGradient>
+        </LinearGradient>
+
+      ) : (
+
+        formData.length > 0 ? (
+          <FlatList
+
             data={formData}
-            renderItem={(item)=>(
-              <FormData 
-              formData={item}
-              setFormData={setFormData}
-              navigation={navigation}
-             
-               /> )
+            renderItem={(item) => (
+              <FormData
+                formData={item}
+                setFormData={setFormData}
+                navigation={navigation}
+
+              />)
 
             }
 
-              
-              ListFooterComponent={<Footer setFormData={setFormData} 
-              formData={formData}  setStartFormData={setStartFormData}
+
+            ListFooterComponent={<Footer setFormData={setFormData}
+              formData={formData} setStartFormData={setStartFormData}
               startFormData={startFormData} setIsLoading={setIsLoading}
-              />}
-                
-            />
+            />}
 
-          ):(
+          />
 
-            <View style={{alignSelf: 'center'}}>
-            <View style={{ width:120, height:120, borderColor:'red', alignItems:'center'}}>
-             <ActivityIndicator style={{alignSelf:'center'}} size='large'/>
+        ) : (
 
-            </View>
-
-              <Text style={{fontSize:hp('3%'), fontWeight:'bold' , textAlign:'center', marginBottom:hp('10%'), marginTop:hp('-10%') }}>Cargando...</Text>
-
+          <LinearGradient colors={['#7F7FD5', '#91EAE4']} style={styles.NoDataContainer}>
+            <View style={styles.NoDataBody}>
+              <Text style={styles.NoDataBodyText}>No hay contenido o internet</Text>
               <View style={styles.ImageContainer}>
                 <Image style={styles.Image} source={require('../../component/imagenes/logo.png')} />
               </View>
+            </View>
+            <Text style={styles.NoDataContainerText}>Power by Eric Marte</Text>
+          </LinearGradient>
 
-              <Text style={{marginTop:wp('80%'), marginLeft:wp('-20%')}}>Power by Eric Marte</Text>
+        )
 
 
-          </View>
 
-          )
-        }
-    
-     
-      </SafeAreaView>
+      )}
 
-  
- )
+
+
+    </LinearGradient>
+
+
+  )
 
 }
 
 
-function Footer (props){
+function Footer(props) {
 
-    const{formData, setFormData, setStartFormData, startFormData,
-    totalFormData, setIsLoading}=props
-  
-    const Mas =() =>{    
-   
-    const string = "No hay más contenido que mostrar. 😅";    
-    
-    const limitData=6;
-  
+  const { formData, setFormData, setStartFormData, startFormData,
+    totalFormData, setIsLoading } = props
+
+  const Mas = () => {
+
+    const string = "No hay más contenido que mostrar. 😅";
+
+    const limitData = 6;
+
     const listData2 = [];
-  
+
     formData < totalFormData && setIsLoading(true);
-  
+
     db.collection('RegistroDePagos').orderBy('startAt', 'desc')
-    .startAfter(startFormData.data().startAt)
-    .limit(limitData).get().then((response)=>{
-  
-      if(response.docs.length > 0 ){
-  
-      setStartFormData(response.docs[response.docs.length - 1]);
-  
-      }else{
-  
-        setIsLoading(false);
-        alertNoForm()
-      }
-  
+      .startAfter(startFormData.data().startAt)
+      .limit(limitData).get().then((response) => {
+
+        if (response.docs.length > 0) {
+
+          setStartFormData(response.docs[response.docs.length - 1]);
+
+        } else {
+
+          setIsLoading(false);
+          alertNoForm()
+        }
+
         response.forEach((doc) => {
-  
-        const formDataInformation = doc.data();
-        formDataInformation.id = doc.id;
-  
-        listData2.push(formDataInformation);
-  
-        
-  
+
+          const formDataInformation = doc.data();
+          formDataInformation.id = doc.id;
+
+          listData2.push(formDataInformation);
+
+
+
+        });
+
+        setFormData([...formData, ...listData2]);
+
       });
-  
-      setFormData([...formData, ...listData2]);
-  
-    });  
-      
-  
-    const alertNoForm = () =>{
-  
+
+
+    const alertNoForm = () => {
+
       Alert.alert(
         'Préstamos J&J',
-         string,
+        string,
         [
-          
+
           {
             text: 'aceptar',
             onPress: () => console.log('Cancel Pressed'),
             style: 'cancel'
           }
-          
+
         ],
         { cancelable: false }
       );
-        
-      }
-     
-  
-  
-      }
-  
-      
-      return(
-        <View style={{backgroundColor:'#d6ae7b', zIndex:-1}}>
-            <TouchableOpacity style={styles.FooterButton} onPress={()=> Mas()} >
-                 <AntDesign name="pluscircle" size={60} color="black" />
-            </TouchableOpacity>
+
+    }
+
+
+
+  }
+
+
+  return (
+    <>
+      {formData.length > 5 ? (
+        <View style={styles.FooterContainer}>
+          <TouchableOpacity style={styles.FooterButton} onPress={() => Mas()} >
+            <AntDesign name="pluscircle" size={wp('13%')} color="black" />
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={styles.FooterContainer}>
+          <View style={styles.FooterButton} >
+
+          </View>
         </View>
       )
+
+      }
+    </>
+  )
+
+}
+
+function FormData(props) {
+
+  const { formData, setFormData, navigation } = props
+  const {
+    NoDeContrato,
+    Nombre,
+    Apellido,
+    Cedula,
+    Dirección,
+    Teléfonos,
+    Plazo,
+    Suma,
+    Interés,
+    Fecha,
+    Pagos,
+    MontoTotal,
+    MontoAPagar,
+    PaymentDate,
+    InicialDate,
+    Intervalo,
+    Hoy,
+    id
+  } = formData.item;
+
+
+
+  const date = Instant.RegularFormat(InicialDate);
+  const time = Instant.MicroTime(date)
+  const hoy = new Date()
+  const hoyMicro = Instant.RegularFormatHoy(hoy)
+  const hoyGetTime = Instant.MicroTime(hoyMicro); 
+  const PaymentMade = Instant.RegularFormat(PaymentDate)
+
   
+ //const comprovar = Instant.RegularFormat(time)
+ //const comprovar2 = Instant.RegularFormat(hoyGetTime)
+   const Contador = (time > hoyGetTime)? 0: time
+
+  function nextPayment() {
+
+    const PeriodoDePago ={
+       Diario:86400000,
+       Semanales:86400000 * 7,
+       Quincenales:86400000 * 15,
+       Mensuales:86400000 * 30
     }
-  
-  function FormData(props){
-  
-    const {formData, setFormData, navigation}=props
-    const {
-         NoDeContrato, 
-         Nombre, 
-         Apellido, 
-         Cedula, 
-         Dirección, 
-         Teléfonos, 
-         Plazo,
-         Suma, 
-         Interés, 
-         Fecha,
-         Pagos,
-         MontoTotal,
-         MontoAPagar,
-         Hoy,
-         id
-         }=formData.item;    
-    console.log(formData);
-  
-    const Delete = ()=>{
-  
-      Alert.alert(
-        "¿Está seguro que desea elimiar esta información.",
-        "Si eliminas esta información también se eliminara de la base de datos.",
-        [
-          {
-            text: "Cancelar",
-            onPress: () => console.log("Cancel Pressed"),
-            style: "cancel"
-          },
-          { text: "Borrar", onPress: () =>remove() }
-               
-        ],
-        { cancelable: false }
-      );
-  
-            
-     }
-  
-     const remove = ()=>{
-  
-      console.log("OK Pressed")
-      db.collection('RegistroDePagos').doc(id).delete().then(function() {
-          //console.log("Document successfully deleted!");
-  
-          navigation.navigate('home');
-  
-        }).then(()=>alert('Documento eliminado')).catch(function(error) {
-            console.error("Error removing document: ", error);
-        });
-  
-     }
 
-   async function execute() {
+    const Periodo = PeriodoDePago[Intervalo];
 
-      const html = `<!DOCTYPE html>
+
+    let Payment = 0
+
+
+    for (let x = Contador; x <= hoyGetTime; x += Periodo) {
+
+      Payment = x;
+
+    }
+
+    let PaymentDate = new Date(Payment)
+    let PaymentDateMicro = Instant.RegularFormat(PaymentDate)
+    
+    let oldPayment = (PaymentDateMicro === hoyMicro && PaymentDateMicro !== date) ? 'Hoy': (PaymentDateMicro === date)? 'Inicio': Instant.MiniFormat(Payment);
+    let newPayment = Payment + Periodo;
+
+    let newTime = new Date(newPayment)
+
+    //Dia de atraso 
+   const LateDate = Instant.DifferenceDays(PaymentDate, PaymentMade)
+
+ 
+
+    return {
+      newTime,
+      oldPayment,
+      PaymentDateMicro,
+      hoyMicro,
+      Periodo,
+      LateDate
+
+    }
+
+  }
+
+
+
+
+  const Delete = () => {
+
+    Alert.alert(
+      "¿Está seguro que desea elimiar esta información.",
+      "Si eliminas esta información también se eliminara de la base de datos.",
+      [
+        {
+          text: "Cancelar",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "Borrar", onPress: () => remove() }
+
+      ],
+      { cancelable: false }
+    );
+
+
+  }
+
+  const remove = () => {
+
+    console.log("OK Pressed")
+    db.collection('RegistroDePagos').doc(id).delete().then(function () {
+      //console.log("Document successfully deleted!");
+
+      navigation.navigate('home');
+
+    }).then(() => alert('Documento eliminado')).catch(function (error) {
+      console.error("Error removing document: ", error);
+    });
+
+  }
+
+  async function execute() {
+
+    const html = `<!DOCTYPE html>
       <html lang="en">
       <head>
           <meta charset="UTF-8">
@@ -400,17 +496,17 @@ function Footer (props){
       </style>               
           
       </body>
-      </html>`; 
-      const { uri } = await Print.printToFileAsync({ html });
-      Sharing.shareAsync(uri)
-  
-    }
+      </html>`;
+    const { uri } = await Print.printToFileAsync({ html });
+    Sharing.shareAsync(uri)
+
+  }
 
 
-    async function imprimir() {
+  async function imprimir() {
 
 
-      const html = `<!DOCTYPE html>
+    const html = `<!DOCTYPE html>
       <html lang="en">
       
       <head>
@@ -552,228 +648,305 @@ function Footer (props){
       </body>
       
       </html>`
-      const { uri } = await Print.printAsync({ html });
-     // Sharing.shareAsync(uri)
-  
-    }
-  
-     return(
+    const { uri } = await Print.printAsync({ html });
+    // Sharing.shareAsync(uri)
 
-    
-        <ScrollView style={styles.body}>
-              
-               <LinearGradient  colors={['#FFEFBA', '#FFFFFF']} key={id} style={styles.container}> 
-               
-                   
-                   <View style={styles.header}>
-                       <Text style={styles.title}>Préstamos J&J</Text>
-                       <Text style={styles.litleTime}>{Hoy}</Text>
-                     </View>
-                   
-                   <View style={styles.bodyContainer}>
-
-                    <View style={styles.ViewContainer}>
-                       <Text style={styles.TextContainer}>Nombre: </Text>
-                       <Text style={styles.AnswerContainer2}>{Nombre}</Text>
-                       
-                     </View>
-                     <View style={styles.ViewContainer}>
-                       <Text style={styles.TextContainer}>Apellido: </Text>
-                       <Text style={styles.AnswerContainer2}>{Apellido}</Text>
-                     </View>
-   
-
-                      <View style={styles.ViewContainer}>
-                        <Text style={styles.TextContainer}>No. de contrato : </Text>
-                        <Text style={styles.AnswerContainer}>{NoDeContrato}</Text>
-                     </View>
-
-                     
-                     <View style={styles.ViewContainer}>
-                       <Text style={styles.TextContainer}>Fecha: </Text>
-                       <Text style={styles.AnswerContainer}>{Fecha}</Text>
-                     </View>
-   
-                     <View style={styles.ViewContainer}>
-                       <Text style={styles.TextContainer}>Cédula: </Text>
-                       <Text style={styles.AnswerContainer}>{Cedula}</Text>
-                     </View>
-   
-            
-                     <View style={styles.ViewContainer}>
-                       <Text style={styles.TextContainer}>Teléfonos: </Text>
-                       <Text style={styles.AnswerContainer}>{Teléfonos}</Text>
-                     </View>
-   
-                     <View style={styles.ViewContainer}>
-                       <Text style={styles.TextContainer}>pago realizado: </Text>
-                       <Text style={styles.AnswerContainer}>{MontoAPagar} $</Text>
-                     </View>
-
-                 
-
-
-   
-                
-               </View>     
-                    <View style={styles.ButtonContainer}>
-                      <TouchableOpacity style={styles.button} onPress={()=>Delete()}>
-                          <MaterialIcons name='delete' color='#fff' size={40} />      
-                      </TouchableOpacity>
-                      
-                      <TouchableOpacity style={styles.button} onPress={async()=>await execute()}>
-                            <MaterialCommunityIcons  name='file-pdf' color='#fff' size={40} />  
-                      </TouchableOpacity>
-
-                      <TouchableOpacity style={styles.button} onPress={async()=>await imprimir()}>
-                            <MaterialIcons name='print' color='#fff' size={40} />  
-                      </TouchableOpacity>
-
-                    </View>
-
-               
-               </LinearGradient>
-   
-         </ScrollView>
-     )
-    
- }  
-
- 
-const styles = StyleSheet.create({
-    body: {
-      backgroundColor: '#d6ae7b',
-      marginBottom:-1
-  
-    },
-    title: {
-      textAlign: 'center',
-      fontSize: wp('5%'),
-      fontWeight: 'bold',
-      color: '#fff',
-      marginLeft:wp('1%'),
-      marginTop:wp('9%'),
-      width:wp('40%')  
-      
-    },
-    litleTime:{
-      textAlign: 'right',
-      fontSize: wp('3%'),
-      fontWeight: 'bold',
-      color: '#fff',
-      marginTop:hp('1%'),
-      marginLeft:wp('1%'),
-      width:wp('50%')
-      
-    },
-  
-    header:{
-      position:'relative',
-      flexDirection:'row',
-      backgroundColor:'#A26008',
-      borderRadius:wp('3%'),
-      height:wp('20%'),
-      marginBottom:hp('3%'),
-      width:wp('95%'),
-       
-    },
-  
-    container: {
-    //  backgroundColor: '#C8BA3E',
-      width:wp('95%'),
-      marginTop:hp('2%'),
-      marginLeft:wp('2%'),
-      marginRight:wp('2%'),
-      borderRadius:wp('5%'),
-      marginBottom: hp('3%'),
-      paddingBottom: hp('4%'),
-      elevation:hp('2%')
-  
-  
-    },
-    ViewContainer: {
-      flexDirection: 'row',
-      alignItems: 'center'
-    },
-
-
-    TextContainer: {
-      fontSize: wp('5%'),
-      fontWeight: 'bold'
-  
-    },
-    AnswerContainer: {
-      fontSize: wp('5%'),
-      fontWeight: 'bold',
-      color: '#120980'
-    },
-  
-    AnswerContainer2:{    
-        fontSize: wp('5%'),
-        fontWeight: 'bold',
-        color: '#120980',
-        marginRight:8
-          
-     },
-   
-    button:{
-      justifyContent:'center',
-      alignItems:'center',
-      width:wp('25%'),
-      height:wp('14%'),
-      backgroundColor:'#812B1C',
-      marginBottom:hp('1%'),
-      marginTop:hp('5%'),
-      marginHorizontal:wp('2%'),
-      paddingTop:hp('2%'),
-      paddingBottom:hp('2%'),
-      borderRadius:wp('5%'),
-      
-   },
-   ButtonContainer:{
-      display:'flex',
-      flexDirection:'row',
-      justifyContent:'center', 
-      alignItems:'center'
-
-   },
-  
-   bodyContainer:{
-    marginHorizontal:wp('2%'),
-    marginBottom:hp('2%')
-  
-  },
-  
-  FooterButton:{
-    alignSelf:'center',
-    alignItems:'center',
-    marginBottom:'10%',
-   // backgroundColor:'#F2E9D0',
-    width:wp('55%'),
-    height:wp('14%'),
-    borderRadius:wp('5%'),
-    marginVertical:hp('5%'),
-    paddingTop:hp('2%'),
-    marginTop:hp('60%')
-  
-  },
-
-  Image:{
-    height:wp('44%'),
-    width:wp('44%'),
-    margin:wp('2%')
-  
-  },
-  
-  ImageContainer:{
-    backgroundColor:'#A26008',  
-    alignItems:'center',
-    justifyContent:'center',
-    width:wp('50%'),
-    height:wp('50%'),
-    borderRadius:wp('5%')
-    
   }
-  
-  
-  });
+
+  return (
+
+
+    <ScrollView >
+
+      <LinearGradient colors={['#FFEFBA', '#FFFFFF']} key={id} style={styles.container}>
+
+
+        <View style={styles.header}>
+          <Text style={styles.title}>Préstamos J&J</Text>
+          <Text style={styles.litleTime}>{Hoy}</Text>
+        </View>
+
+        <View style={styles.bodyContainer}>
+
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>Nombre: </Text>
+            <Text style={styles.AnswerContainer2}>{Nombre}</Text>
+
+          </View>
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>Apellido: </Text>
+            <Text style={styles.AnswerContainer2}>{Apellido}</Text>
+          </View>
+
+
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>No. de contrato : </Text>
+            <Text style={styles.AnswerContainer}>{NoDeContrato}</Text>
+          </View>
+
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>Cédula: </Text>
+            <Text style={styles.AnswerContainer}>{Cedula}</Text>
+          </View>
+
+
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>Teléfonos: </Text>
+            <Text style={styles.AnswerContainer}>{Teléfonos}</Text>
+          </View>
+
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>pago realizado: </Text>
+            <Text style={styles.AnswerContainer}>{MontoAPagar} $</Text>
+          </View>
+
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>Fecha De Pago: </Text>
+            <Text style={styles.AnswerContainer}>{nextPayment().oldPayment}</Text>
+          </View>
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>Pago Realizado: </Text>
+            <Text style={styles.AnswerContainer}>{Instant.MiniFormat(PaymentDate)}</Text>
+          </View>
+
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>Dias Retardados: </Text>
+            <Text style={styles.AnswerContainer}>{nextPayment().LateDate}</Text>
+          </View>
+
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>Próximo Pago: </Text>
+            <Text style={styles.AnswerContainer}>{Instant.MiniFormat(nextPayment().newTime)}</Text>
+          </View>
+
+
+
+        </View>
+        <View style={styles.ButtonContainer}>
+          <TouchableOpacity style={styles.button} onPress={() => Delete()}>
+            <MaterialIcons name='delete' color='#fff' size={40} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button} onPress={async () => await execute()}>
+            <MaterialCommunityIcons name='file-pdf' color='#fff' size={40} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button} onPress={async () => await imprimir()}>
+            <MaterialIcons name='print' color='#fff' size={40} />
+          </TouchableOpacity>
+
+        </View>
+
+
+      </LinearGradient>
+
+    </ScrollView>
+  )
+
+}
+
+
+const styles = StyleSheet.create({
+  body: {
+    flex:1,
+    height:'100%',
+   // backgroundColor: '#d6ae7b',
+    
+
+  },
+  title: {
+    textAlign: 'center',
+    fontSize: wp('5%'),
+    fontWeight: 'bold',
+    color: '#fff',
+    marginLeft: wp('1%'),
+    marginTop: wp('9%'),
+    width: wp('40%')
+
+  },
+  litleTime: {
+    textAlign: 'right',
+    fontSize: wp('3%'),
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: hp('1%'),
+    marginLeft: wp('1%'),
+    width: wp('50%')
+
+  },
+
+  header: {
+    flexDirection: 'row',
+    backgroundColor: '#A26008',
+    // borderRadius: wp('3%'),
+    height: wp('20%'),
+    marginBottom: hp('3%'),
+    width: wp('95%'),
+    borderTopLeftRadius: wp('3%'),
+    borderTopRightRadius: wp('3%')
+
+  },
+
+  container: {
+    backgroundColor: '#C8BA3E',
+    width: wp('95%'),
+    marginTop: hp('2%'),
+    marginLeft: wp('2%'),
+    marginRight: wp('2%'),
+    borderRadius: wp('5%'),
+    marginBottom: hp('3%'),
+    paddingBottom: hp('4%'),
+    elevation: hp('1%')
+
+
+
+  },
+  ViewContainer: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+
+  TextContainer: {
+    fontSize: wp('5%'),
+    fontWeight: 'bold'
+
+  },
+  AnswerContainer: {
+    fontSize: wp('5%'),
+    fontWeight: 'bold',
+    color: '#120980'
+
+  },
+  AnswerContainer2: {
+    fontSize: wp('5%'),
+    fontWeight: 'bold',
+    color: '#120980'
+
+  },
+
+  button: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: wp('20%'),
+    height: wp('14%'),
+    backgroundColor: '#A26008',
+    marginBottom: wp('1%'),
+    // marginTop: hp('5%'),
+    marginHorizontal: wp('2%'),
+    paddingTop: wp('2%'),
+    paddingBottom: wp('2%'),
+    borderRadius: wp('5%'),
+
+  },
+  ButtonContainer: {
+    position: 'relative',
+    top: wp('8%'),
+    height: wp('23%'),
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#A26008',
+    borderBottomRightRadius: wp('3%'),
+    borderBottomLeftRadius: wp('3%')
+
+
+  },
+
+  bodyContainer: {
+    marginHorizontal: wp('2%'),
+    marginBottom: hp('2%')
+
+  },
+
+  TextButton: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff'
+
+
+  },
+
+  FooterContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    // backgroundColor: 'red'
+  },
+  FooterButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    // backgroundColor:'#F2E9D0',
+    width: wp('55%'),
+    height: wp('24%'),
+    borderRadius: wp('5%'),
+
+  },
+
+  FooterTextButton: {
+    fontSize: 20,
+    fontWeight: 'bold'
+
+  },
+
+  Image: {
+    height: wp('44%'),
+    width: wp('44%'),
+    margin: wp('2%')
+
+  },
+
+  ImageContainer: {
+    backgroundColor: '#A26008',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: wp('50%'),
+    height: wp('50%'),
+    borderRadius: wp('5%')
+
+  },
+  NoDataContainer: {
+    height: '100%',
+    alignItems: 'center'
+  },
+  NoDataBody: {
+    height: wp('80%'),
+    width: wp('100%'),
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  NoDataBodyText: {
+    fontSize: wp('5%'),
+    marginBottom: wp('5%'),
+    color: '#fff',
+    fontWeight: 'bold'
+  },
+  NoDataContainerText: {
+    position: 'absolute',
+    top: wp('140%')
+  },
+  loadingContainer: {
+    height: '100%',
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+
+
+  },
+  loadingBody: {
+    height: wp('30%'),
+    width: wp('80%'),
+    backgroundColor: 'red',
+    borderRadius: wp('5%'),
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: wp('4%')
+
+  },
+  loadingBodyText: {
+    fontSize: wp('6%'),
+    color: '#fff',
+    marginHorizontal: wp('5%'),
+    fontWeight: 'bold'
+  },
+
+
+});

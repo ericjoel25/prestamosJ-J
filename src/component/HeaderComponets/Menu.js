@@ -4,7 +4,8 @@ import { View, Image, Text, StyleSheet, TouchableOpacity, Alert, } from 'react-n
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import firebase from '../firebase/firebase';
 import {Ionicons } from '@expo/vector-icons';
-
+import { LinearGradient } from 'expo-linear-gradient';
+import { Instant } from '../globalStyle/Instant';
 
 export default function Mune(props) {
 
@@ -29,6 +30,8 @@ export default function Mune(props) {
 
     }
 
+    const Fecha = new Date()
+
     function DrawerMune(props) {
         return (
             <TouchableOpacity onPress={props.navigation}>
@@ -43,10 +46,11 @@ export default function Mune(props) {
 
     return (
         <View style={styles.container}>
-            <View style={styles.logoContainer}>
+            <LinearGradient colors={['#FFDEB7', '#85D7D9']} style={styles.logoContainer}>
                 <Image style={styles.logo} source={require('../imagenes/Logo150.png')} />
                 <Text style={styles.logoText}>José Marte</Text>
-            </View>
+                <Text  style={styles.logoTextTime}>{`${Instant.LongFormat(Fecha)}`}</Text>
+            </LinearGradient>
 
 
             <DrawerMune icon='home' titelName='Inicio' navigation={() => props.navigation.navigate('Home')} />
@@ -73,30 +77,33 @@ const styles = StyleSheet.create({
     },
 
     logoContainer: {
-        position: 'relative',
+        justifyContent:'center',
+        alignItems:'center',
         backgroundColor: '#226D65',
         flexDirection: 'row',
         marginBottom: wp('4%'),
-        height: wp('25%'),
-        borderTopRightRadius: wp('3%')
+        height: wp('50%'),
+        borderTopRightRadius: wp('3%'),
+        flexDirection:'column'
     },
     logo: {
-        position:'relative',
-        top:wp('4%'),
-        left:wp('1%'),
-        width: wp('20%'),
-        height: wp('20%')
+        marginTop:wp('-3%'),
+        width: wp('25%'),
+        height: wp('25%')
 
     },
 
     logoText: {
-        position: 'relative',
-        top: wp('19%'),
-        left:wp('10%'),
-        fontSize: hp('2.2%'),
+        fontSize: wp('5%'),
         fontWeight: 'bold',
-        color: '#fff'
+        color: '#000',
+        paddingTop:wp('2%')
 
+    },
+    logoTextTime:{
+         marginTop:wp('5%'),
+         fontSize:wp('3%'),
+         fontWeight:'bold'
     },
     footerButton: {
         position: 'absolute',

@@ -10,7 +10,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-
+import { Instant } from '../../component/globalStyle/Instant';
 
 
 const db = firebase.firestore(firebase);
@@ -194,9 +194,73 @@ function FormDestete(props) {
     Pagos,
     MontoTotal,
     MontoAPagar,
+    PaymentDate,
+    InicialDate,
+    Intervalo,
     Hoy,
     id
   } = formData.item;
+
+
+
+  const date = Instant.RegularFormat(InicialDate);
+  const time = Instant.MicroTime(date)
+  const hoy = new Date()
+  const hoyMicro = Instant.RegularFormatHoy(hoy)
+  const hoyGetTime = Instant.MicroTime(hoyMicro); 
+  const PaymentMade = Instant.RegularFormat(PaymentDate)
+
+  
+ //const comprovar = Instant.RegularFormat(time)
+ //const comprovar2 = Instant.RegularFormat(hoyGetTime)
+   const Contador = (time > hoyGetTime)? 0: time
+
+  function nextPayment() {
+
+    const PeriodoDePago ={
+       Diario:86400000,
+       Semanales:86400000 * 7,
+       Quincenales:86400000 * 15,
+       Mensuales:86400000 * 30
+    }
+
+    const Periodo = PeriodoDePago[Intervalo];
+
+
+    let Payment = 0
+
+
+    for (let x = Contador; x <= hoyGetTime; x += Periodo) {
+
+      Payment = x;
+
+    }
+
+    let PaymentDate = new Date(Payment)
+    let PaymentDateMicro = Instant.RegularFormat(PaymentDate)
+    
+    let oldPayment = (PaymentDateMicro === hoyMicro && PaymentDateMicro !== date) ? 'Hoy': (PaymentDateMicro === date)? 'Inicio': Instant.MiniFormat(Payment);
+    let newPayment = Payment + Periodo;
+
+    let newTime = new Date(newPayment)
+
+    //Dia de atraso 
+   const LateDate = Instant.DifferenceDays(PaymentDate, PaymentMade)
+
+ 
+
+    return {
+      newTime,
+      oldPayment,
+      PaymentDateMicro,
+      hoyMicro,
+      Periodo,
+      LateDate
+
+    }
+
+  }
+
 
 
 
@@ -535,12 +599,6 @@ function FormDestete(props) {
             <Text style={styles.AnswerContainer}>{NoDeContrato}</Text>
           </View>
 
-
-          <View style={styles.ViewContainer}>
-            <Text style={styles.TextContainer}>Fecha: </Text>
-            <Text style={styles.AnswerContainer}>{Fecha}</Text>
-          </View>
-
           <View style={styles.ViewContainer}>
             <Text style={styles.TextContainer}>Cédula: </Text>
             <Text style={styles.AnswerContainer}>{Cedula}</Text>
@@ -555,11 +613,30 @@ function FormDestete(props) {
           <View style={styles.ViewContainer}>
             <Text style={styles.TextContainer}>Pago realizado: </Text>
             <Text style={styles.AnswerContainer}>{MontoAPagar} $</Text>
+          </View> 
+
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>Fecha De Pago: </Text>
+            <Text style={styles.AnswerContainer}>{nextPayment().oldPayment}</Text>
+          </View>
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>Pago Realizado: </Text>
+            <Text style={styles.AnswerContainer}>{Instant.MiniFormat(PaymentDate)}</Text>
+          </View>
+
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>Dias Retardados: </Text>
+            <Text style={styles.AnswerContainer}>{nextPayment().LateDate}</Text>
+          </View>
+
+          <View style={styles.ViewContainer}>
+            <Text style={styles.TextContainer}>Próximo Pago: </Text>
+            <Text style={styles.AnswerContainer}>{Instant.MiniFormat(nextPayment().newTime)}</Text>
           </View>
 
 
         </View>
-        <View style={styles.ButtonContainer}>
+        <View style={styles.ButtonContainer}> 
 
           <TouchableOpacity style={styles.button} onPress={() => execute()}>
             <MaterialCommunityIcons name='file-pdf' color='#fff' size={40} />
@@ -645,18 +722,19 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    position: 'relative',
     flexDirection: 'row',
     backgroundColor: '#A26008',
-    borderRadius: wp('3%'),
+    // borderRadius: wp('3%'),
     height: wp('20%'),
     marginBottom: hp('3%'),
     width: wp('95%'),
+    borderTopLeftRadius: wp('3%'),
+    borderTopRightRadius: wp('3%')
 
   },
 
   container: {
-    //  backgroundColor: '#C8BA3E',
+    backgroundColor: '#C8BA3E',
     width: wp('95%'),
     marginTop: hp('2%'),
     marginLeft: wp('2%'),
@@ -664,9 +742,8 @@ const styles = StyleSheet.create({
     borderRadius: wp('5%'),
     marginBottom: hp('3%'),
     paddingBottom: hp('4%'),
-    elevation: hp('2%')
-
-
+    elevation: hp('1%')
+    
   },
   ViewContainer: {
     flexDirection: 'row',
@@ -695,25 +772,30 @@ const styles = StyleSheet.create({
   button: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: wp('30%'),
+    width: wp('20%'),
     height: wp('14%'),
-    backgroundColor: '#812B1C',
-    marginBottom: hp('1%'),
-    marginTop: hp('5%'),
+   //  backgroundColor: '#0B5A8A',
+    marginBottom: wp('1%'),
+    // marginTop: hp('5%'),
     marginHorizontal: wp('2%'),
-    paddingTop: hp('2%'),
-    paddingBottom: hp('2%'),
+    paddingTop: wp('2%'),
+    paddingBottom: wp('2%'),
     borderRadius: wp('5%'),
 
   },
   ButtonContainer: {
-    display: 'flex',
+    position: 'relative',
+    top: wp('8%'),
+    height: wp('23%'),
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: '#A26008',
+    borderBottomRightRadius: wp('3%'),
+    borderBottomLeftRadius: wp('3%')
+
 
   },
-
   bodyContainer: {
     marginHorizontal: wp('2%'),
     marginBottom: hp('2%')

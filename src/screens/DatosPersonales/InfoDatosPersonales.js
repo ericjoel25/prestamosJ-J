@@ -218,7 +218,7 @@ function Footer(props) {
       {formData.length > 5 ? (
         <View style={styles.FooterContainer}>
           <TouchableOpacity style={styles.FooterButton} onPress={() => Mas()} >
-            <AntDesign name="pluscircle" size={60} color="black" />
+            <AntDesign name="pluscircle" size={wp('13%')} color="black" />
           </TouchableOpacity>
         </View>
       ) : (
@@ -607,9 +607,7 @@ const styles = StyleSheet.create({
     marginBottom: hp('3%'),
     paddingBottom: hp('4%'),
     elevation: hp('1%')
-
-
-
+    
   },
   ViewContainer: {
     flexDirection: 'row',
@@ -671,19 +669,19 @@ const styles = StyleSheet.create({
 
   },
   FooterContainer: {
-    //backgroundColor: 'red'
+    justifyContent:'center',
+    alignItems: 'center',
+   // backgroundColor: 'red'
   },
   FooterButton: {
-    alignSelf: 'center',
+    justifyContent:'center',
     alignItems: 'center',
-    marginBottom: '10%',
-    // backgroundColor:'#F2E9D0',
+   // backgroundColor:'#F2E9D0',
     width: wp('55%'),
-    height: wp('14%'),
+    height: wp('24%'),
     borderRadius: wp('5%'),
-    marginVertical: hp('5%'),
-    paddingTop: hp('2%'),
-    //marginTop: hp('60%')
+    
+
 
   },
 

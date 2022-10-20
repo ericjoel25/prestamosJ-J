@@ -10,6 +10,7 @@
       "resizeMode": "cover",
       "backgroundColor": "#0AAAB4"
     },
+    "jsEngine": "hermes",
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -17,7 +18,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.Prestamo.M.D"
     },
     "android": {
       "adaptiveIcon": {

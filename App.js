@@ -1,5 +1,5 @@
 import React, {useState, useEffect } from "react";
-import {decode, encode} from 'base-64';
+//import {decode, encode} from 'base-64';
 import 'react-native-gesture-handler';
 import { StyleSheet, LogBox, } from 'react-native';
 import Auth from './src/screens/auth';
@@ -12,8 +12,8 @@ LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
 LogBox.ignoreAllLogs();//Ignore all log notifications
 
 
-if(!global.btoa) global.btoa = encode;
-if(!global.atob) global.atob =decode;
+//if(!global.btoa) global.btoa = encode;
+//if(!global.atob) global.atob =decode;
 
 export default function App(){
  const[user, setUser]= useState(undefined);

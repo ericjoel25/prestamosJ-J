@@ -6,7 +6,7 @@ import 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { AntDesign } from '@expo/vector-icons';
-
+import { Instant } from "../../component/globalStyle/Instant";
 
 
 const db = firebase.firestore(firebase);
@@ -21,7 +21,7 @@ export default function ListaDeClientes(props) {
   const [totalFormData, setTotalFormData] = useState(0);
   const [startFormData, setStartFormData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [date, setDate] = useState(new Date())
 
   const limitData = 6;
 
@@ -60,7 +60,7 @@ export default function ListaDeClientes(props) {
 
         //  console.log(formDataInformation);
 
-          listData.push(formDataInformation);
+        listData.push(formDataInformation);
 
       });
 
@@ -76,7 +76,7 @@ export default function ListaDeClientes(props) {
 
   return (
     <LinearGradient colors={['#7F7FD5', '#91EAE4']} style={styles.body}>
-      {/*<StatusBar barStyle='light-content' hidden={false} backgroundColor='#1372B8' /> */}
+      <StatusBar barStyle='light-content' hidden={false} backgroundColor='#1372B8' />  
 
       {isLoading === true ? (
 
@@ -212,7 +212,7 @@ function Footer(props) {
       {formData.length > 5 ? (
         <View style={styles.FooterContainer}>
           <TouchableOpacity style={styles.FooterButton} onPress={() => Mas()} >
-            <AntDesign name="pluscircle" size={60} color="black" />
+            <AntDesign name="pluscircle" size={wp('13%')} color="black" />
           </TouchableOpacity>
         </View>
       ) : (
@@ -244,10 +244,69 @@ function FormData(props) {
     Interés,
     Fecha,
     Pagos,
+    InicialDate,
+    Intervalo,
     MontoTotal,
     Hoy,
-    id
+    id,
+    startAt
   } = formData.item;
+
+
+  const date = Instant.RegularFormat(InicialDate);
+  const time = Instant.MicroTime(date)
+  const hoy = new Date()
+  const hoyMicro = Instant.RegularFormatHoy(hoy)
+  const hoyGetTime = Instant.MicroTime(hoyMicro); 
+  
+ //const comprovar = Instant.RegularFormat(time)
+ //const comprovar2 = Instant.RegularFormat(hoyGetTime)
+   const Contador = (time > hoyGetTime)? 0: time
+
+  function nextPayment() {
+
+    const PeriodoDePago ={
+       Diario:86400000,
+       Semanales:86400000 * 7,
+       Quincenales:86400000 * 15,
+       Mensuales:86400000 * 30
+    }
+
+    const Periodo = PeriodoDePago[Intervalo];
+
+
+    let Payment = 0
+
+
+    for (let x = Contador; x <= hoyGetTime; x += Periodo) {
+
+      Payment = x;
+
+    }
+
+    let PaymentDate = new Date(Payment)
+    let PaymentDateMicro = Instant.RegularFormat(PaymentDate)
+    
+    let oldPayment = (PaymentDateMicro === hoyMicro && PaymentDateMicro !== date) ? 'Hoy': (PaymentDateMicro === date)? 'Inicio': Instant.MiniFormat(Payment);
+    let newPayment = Payment + Periodo;
+
+    let newTime = new Date(newPayment)
+
+ 
+
+    return {
+      newTime,
+      oldPayment,
+      PaymentDateMicro,
+      hoyMicro,
+      Periodo
+
+    }
+
+  }
+
+   const DayLess = ()=> Instant.DifferenceDays(new Date, nextPayment().newTime) + 1;
+
 
 
   const Navigation = () => {
@@ -266,14 +325,17 @@ function FormData(props) {
 
       <LinearGradient colors={['#1e3c72', '#2a5298']} key={id} style={styles.container}>
 
-        <TouchableOpacity onPress={() => Navigation()}>
+        <View>
 
           <View style={styles.contratoId}>
             <Text style={styles.AnswerContainer}>{NoDeContrato}</Text>
           </View>
 
           <View style={styles.FlexContainer}>
-            <Image style={styles.Avatar} source={require('../../component/imagenes/Logo150.png')} />
+
+            <TouchableOpacity onPress={() => Navigation()}>
+               <Image style={styles.Avatar} source={require('../../component/imagenes/Logo150.png')} />
+            </TouchableOpacity>
 
             <View style={styles.bodyContainer}>
 
@@ -282,15 +344,41 @@ function FormData(props) {
               </View>
 
               <View style={styles.ViewContainer}>
-                <Text style={styles.AnswerContainer}>Cédula:</Text>
+                <Text style={styles.AnswerContainer2}>Cédula:</Text>
                 <Text style={styles.AnswerContainer}>{Cedula}</Text>
               </View>
 
 
               <View style={styles.ViewContainer}>
-                <Text style={styles.AnswerContainer}>Teléfonno:</Text>
+                <Text style={styles.AnswerContainer2}>Teléfonno:</Text>
                 <Text style={styles.AnswerContainer}>{Teléfonos}</Text>
               </View>
+              <View style={styles.ViewContainer}>
+                <Text style={styles.AnswerContainer2}>Plazo:</Text>
+                <Text style={styles.AnswerContainer}>{Plazo}</Text>
+              </View>
+
+              <View style={styles.ViewContainer}>
+                <Text style={styles.AnswerContainer2}>Día Inicial:</Text>
+                <Text style={styles.AnswerContainer}>{Instant.MiniFormat(InicialDate)}</Text>
+              </View>
+
+              <View style={styles.ViewContainer}>
+                <Text style={styles.AnswerContainer2}>P. Anterior:</Text>
+                <Text style={styles.AnswerContainer}>{nextPayment().oldPayment}</Text>
+              </View>
+
+              <View style={styles.ViewContainer}>
+                <Text style={styles.AnswerContainer2}>P. Próximo:</Text>
+                <Text style={styles.AnswerContainer}>{Instant ? Instant.MiniFormat(nextPayment().newTime) : 'No hay Fecha'}</Text>
+              </View>
+
+              <View style={styles.ViewContainer}>
+                <Text style={styles.AnswerContainer2}>Dias Restantes:</Text>
+                <Text style={styles.AnswerContainer}>{(DayLess() === 1)?`${DayLess()} día`:`${DayLess()} dias`}</Text>
+              </View>
+
+
 
             </View>
 
@@ -299,7 +387,7 @@ function FormData(props) {
           </View>
 
 
-        </TouchableOpacity>
+        </View>
       </LinearGradient>
 
 
@@ -320,7 +408,7 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    height: wp('35%'),
+    minHeight: wp('35%'),
     marginTop: hp('2%'),
     marginHorizontal: wp('2%'),
     paddingHorizontal: wp('0%'),
@@ -338,13 +426,27 @@ const styles = StyleSheet.create({
 
   AnswerContainer: {
     fontSize: wp('4.1%'),
-    color: '#CDD1D3',
+    color: '#9E9E9E',
     marginHorizontal: wp('1%')
+  },
+  AnswerContainer2:{
+    fontSize: wp('4.1%'),
+    color: '#DBDBDB',
+    marginHorizontal: wp('1%'),
+    fontWeight:'bold'
   },
   contratoId: {
     width: wp('90%'),
     // backgroundColor:'red',
     alignItems: 'flex-end'
+
+  },
+
+  timeContainer: {
+    position: 'relative',
+    top: wp('4%'),
+    left: wp('-15%'),
+    // backgroundColor:'red',
 
   },
 
@@ -364,23 +466,23 @@ const styles = StyleSheet.create({
   FlexContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center'
 
   },
-
   FooterContainer: {
-    //backgroundColor: 'red'
+    justifyContent: 'center',
+    alignItems: 'center',
+    // backgroundColor: 'red'
   },
   FooterButton: {
-    alignSelf: 'center',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: '10%',
     // backgroundColor:'#F2E9D0',
     width: wp('55%'),
-    height: wp('14%'),
+    height: wp('24%'),
     borderRadius: wp('5%'),
-    marginVertical: hp('5%'),
-    paddingTop: hp('2%'),
-    //marginTop: hp('60%')
+
+
 
   },
 
@@ -453,7 +555,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: wp('140%')
   },
-  
+
   NoDataContainer: {
     height: '100%',
     alignItems: 'center'

@@ -80,7 +80,7 @@ export default function ListaDePagos(props) {
 
         {isLoading === true ? (
 
-          <LinearGradient colors={['#7F7FD5', '#91EAE4']} style={styles.loadingContainer}>
+          <LinearGradient colors={['#d6ae7b', '#d6ae7b']} style={styles.loadingContainer}>
             <LinearGradient colors={['#c31432', '#240b36']} style={styles.loadingBody}>
               <ActivityIndicator color='#fff' size={wp('15%')} />
               <Text style={styles.loadingBodyText}>Cargando...</Text>
@@ -213,7 +213,7 @@ function Footer(props) {
       {formData.length > 5 ? (
         <View style={styles.FooterContainer}>
           <TouchableOpacity style={styles.FooterButton} onPress={() => Mas()} >
-            <AntDesign name="pluscircle" size={60} color="black" />
+            <AntDesign name="pluscircle" size={wp('13%')} color="black" />
           </TouchableOpacity>
         </View>
       ) : (
@@ -291,6 +291,7 @@ function FormData(props) {
                 <Text style={styles.AnswerContainer}>Teléfonno:</Text>
                 <Text style={styles.AnswerContainer}>{Teléfonos}</Text>
               </View>
+              
 
             </View>
 
@@ -364,19 +365,17 @@ const styles = StyleSheet.create({
   },
 
   FooterContainer: {
-    //backgroundColor: 'red'
+    justifyContent:'center',
+    alignItems: 'center',
+   // backgroundColor: 'red'
   },
   FooterButton: {
-    alignSelf: 'center',
+    justifyContent:'center',
     alignItems: 'center',
-    marginBottom: '10%',
-    // backgroundColor:'#F2E9D0',
+   // backgroundColor:'#F2E9D0',
     width: wp('55%'),
-    height: wp('14%'),
+    height: wp('24%'),
     borderRadius: wp('5%'),
-    marginVertical: hp('5%'),
-    paddingTop: hp('2%'),
-    //marginTop: hp('60%')
 
   },
 
@@ -449,26 +448,7 @@ const styles = StyleSheet.create({
     top: wp('140%')
   },
 
-  NoDataContainer: {
-    height: '100%',
-    alignItems: 'center'
-  },
-  NoDataBody: {
-    height: wp('80%'),
-    width: wp('100%'),
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  NoDataBodyText: {
-    fontSize: wp('5%'),
-    marginBottom: wp('5%'),
-    color: '#fff',
-    fontWeight: 'bold'
-  },
-  NoDataContainerText: {
-    position: 'absolute',
-    top: wp('140%')
-  }
+  
 
 
 });

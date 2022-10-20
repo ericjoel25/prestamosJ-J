@@ -22,7 +22,7 @@ export default function HomeHeader(props){
              <SimpleLineIcons style={styles.menu} name="menu" size={30} color="#fff"    />  
         </TouchableOpacity>
           
-       <Text style={styles.HeaderText}>Préstamos J&J</Text>
+        <Text style={styles.HeaderText}>Préstamos J&J</Text>
             
     </LinearGradient>
 
@@ -43,6 +43,9 @@ const styles= StyleSheet.create({
         backgroundColor:'#036082',
         borderBottomLeftRadius:wp('10%'),
         borderBottomRightRadius:wp('10%'),
+        borderBottomWidth:hp('0.25%'),
+        borderLeftWidth:wp('0.2%'),
+        borderRightWidth:wp('0.2%'),
         alignItems:'center',
         justifyContent:'space-between',
         flexDirection:'row',
@@ -50,7 +53,7 @@ const styles= StyleSheet.create({
 
     HeaderText:{
         position:'relative',
-        top:wp('5%'),
+        top:wp('7.5%'),
         left:wp('-15%'),
         width:wp('70%'),
         fontWeight:'bold',

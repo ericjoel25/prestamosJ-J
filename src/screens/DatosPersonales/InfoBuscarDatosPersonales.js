@@ -9,7 +9,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Print from 'expo-print';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
-import { useEffect } from 'react/cjs/react.development';
 
 
 const db = firebase.firestore(firebase);
@@ -527,11 +526,12 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     backgroundColor: '#0B5A8A',
-    borderRadius: wp('3%'),
+    // borderRadius: wp('3%'),
     height: wp('20%'),
     marginBottom: hp('3%'),
     width: wp('95%'),
-
+    borderTopLeftRadius: wp('3%'),
+    borderTopRightRadius: wp('3%')
 
   },
 
@@ -546,6 +546,8 @@ const styles = StyleSheet.create({
     paddingBottom: hp('4%'),
     elevation: hp('1%')
 
+
+
   },
   ViewContainer: {
     flexDirection: 'row',
@@ -555,7 +557,6 @@ const styles = StyleSheet.create({
   TextContainer: {
     fontSize: wp('5%'),
     fontWeight: 'bold'
-
 
   },
   AnswerContainer: {
@@ -567,25 +568,30 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    width: wp('30%'),
+    width: wp('20%'),
     height: wp('14%'),
     backgroundColor: '#0B5A8A',
-    marginBottom: hp('1%'),
-    marginTop: hp('5%'),
+    marginBottom: wp('1%'),
+    // marginTop: hp('5%'),
     marginHorizontal: wp('2%'),
-    paddingTop: hp('2%'),
-    paddingBottom: hp('2%'),
+    paddingTop: wp('2%'),
+    paddingBottom: wp('2%'),
     borderRadius: wp('5%'),
 
   },
   ButtonContainer: {
-    display: 'flex',
+    position: 'relative',
+    top: wp('8%'),
+    height: wp('23%'),
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: '#0B5A8A',
+    borderBottomRightRadius: wp('3%'),
+    borderBottomLeftRadius: wp('3%')
+
 
   },
 
@@ -600,26 +606,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff'
 
-
-  },
-  FooterButton: {
-    alignSelf: 'center',
-    alignItems: 'center',
-    marginBottom: '10%',
-    // backgroundColor:'#F2E9D0',
-    width: wp('55%'),
-    height: wp('14%'),
-    borderRadius: wp('5%'),
-    marginVertical: hp('5%'),
-    paddingTop: hp('2%'),
-    marginTop: hp('60%')
-
-
-  },
-
-  FooterTextButton: {
-    fontSize: 20,
-    fontWeight: 'bold'
 
   },
   Image: {
